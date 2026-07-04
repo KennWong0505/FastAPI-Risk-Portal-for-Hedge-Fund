@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Risk Portal Dashboard</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root, [data-theme="light"] { --bg:#f7f6f2; --surface:#fbfaf7; --surface-2:#f3f0ec; --text:#25231f; --muted:#6f6d67; --border:#d9d5cd; --primary:#01696f; --primary-contrast:#f7f6f2; --danger:#a12c7b; --success:#437a22; --shadow:0 18px 40px rgba(26,24,20,.08); --radius:18px; --radius-sm:12px; --space-1:.25rem; --space-2:.5rem; --space-3:.75rem; --space-4:1rem; --space-5:1.25rem; --space-6:1.5rem; --space-8:2rem; --space-10:2.5rem; --space-12:3rem; --space-16:4rem; }
+    [data-theme="dark"] { --bg:#171614; --surface:#1d1c1a; --surface-2:#22211f; --text:#cdccca; --muted:#7f7d79; --border:#34322e; --primary:#4f98a3; --primary-contrast:#171614; --danger:#d163a7; --success:#6daa45; --shadow:0 18px 40px rgba(0,0,0,.35); }
+    *{box-sizing:border-box} html{color-scheme:light dark} body{margin:0;font-family:Satoshi,Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5} button,input{font:inherit} button{cursor:pointer;border:0}
+    .wrap{max-width:1200px;margin:0 auto;padding:var(--space-6)} .topbar{display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);margin-bottom:var(--space-8)} .brand{display:flex;align-items:center;gap:var(--space-3)} .logo{width:40px;height:40px;border-radius:12px;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;box-shadow:var(--shadow)} .title h1{font-size:clamp(1.4rem,1rem + 2vw,2rem);margin:0}.title p{margin:.2rem 0 0;color:var(--muted)} .toggle,.btn{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:999px;padding:.8rem 1rem} .toggle{width:44px;height:44px;display:grid;place-items:center}
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:var(--space-6);align-items:start;margin-bottom:var(--space-8)} .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)} .form{padding:var(--space-6)} .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)} label{display:block;font-size:.9rem;color:var(--muted);margin-bottom:.35rem} input{width:100%;padding:1rem;border-radius:14px;border:1px solid var(--border);background:var(--surface-2);color:var(--text)} .full{grid-column:1/-1} .actions{display:flex;gap:var(--space-3);margin-top:var(--space-5);flex-wrap:wrap} .primary{background:var(--primary);color:var(--primary-contrast);border-color:var(--primary)} .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4)} .kpi{padding:var(--space-5)} .kpi .label{color:var(--muted);font-size:.85rem}.kpi .value{font-size:clamp(1.3rem,1rem + 1vw,2rem);font-weight:700;margin-top:.35rem}
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:var(--space-6);margin-top:var(--space-6)} .card{padding:var(--space-6)} .card h2{margin:0 0 var(--space-4);font-size:1.1rem} .meta{color:var(--muted);font-size:.92rem} canvas{width:100%!important;height:320px!important} .status{display:inline-flex;align-items:center;gap:.5rem;padding:.45rem .75rem;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);font-size:.9rem;margin-top:var(--space-4)} .dot{width:10px;height:10px;border-radius:50%;background:var(--success)} .foot{margin-top:var(--space-8);color:var(--muted);font-size:.9rem}
+    @media (max-width: 900px){.hero,.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand"><div class="logo" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19V5h14v14H5Z"/><path d="M8 15l3-4 2 2 3-5"/></svg></div><div class="title"><h1>Risk Portal</h1><p>Portfolio risk and performance dashboard</p></div></div>
+      <button class="toggle" data-theme-toggle aria-label="Switch theme">☾</button>
+    </header>
+
+    <section class="hero">
+      <article class="panel form">
+        <h2 style="margin-top:0">Analyse a portfolio</h2>
+        <form id="risk-form">
+          <div class="form-grid">
+            <div class="full"><label for="tickers">Tickers</label><input id="tickers" value="0700.HK" placeholder="0700.HK, 9988.HK" /></div>
+            <div><label for="weights">Weights</label><input id="weights" value="1.0" placeholder="1.0" /></div>
+            <div><label for="lookback">Lookback days</label><input id="lookback" type="number" min="1" value="365" /></div>
+            <div><label for="confidence">Confidence level</label><input id="confidence" type="number" min="0" max="1" step="0.01" value="0.95" /></div>
+            <div class="full actions"><button class="btn primary" type="submit">Run risk analysis</button><button class="btn" type="button" id="fill-sample">Load sample</button></div>
+          </div>
+        </form>
+        <div class="status"><span class="dot"></span><span id="status-text">Ready to analyse</span></div>
+      </article>
+      <aside class="panel card"><h2>How it works</h2><p class="meta">The dashboard submits your portfolio to FastAPI, receives JSON, and renders risk metrics and charts.</p><div class="kpis" style="grid-template-columns:1fr 1fr;margin-top:var(--space-5)"><div class="kpi panel" style="background:var(--surface-2)"><div class="label">VaR</div><div class="value" id="var-value">—</div></div><div class="kpi panel" style="background:var(--surface-2)"><div class="label">Sharpe</div><div class="value" id="sharpe-value">—</div></div></div></aside>
+    </section>
+
+    <section class="kpis" id="kpi-grid"><div class="panel kpi"><div class="label">Historical VaR</div><div class="value" id="kpi-var-h">—</div></div><div class="panel kpi"><div class="label">Expected Shortfall</div><div class="value" id="kpi-es">—</div></div><div class="panel kpi"><div class="label">Volatility</div><div class="value" id="kpi-vol">—</div></div><div class="panel kpi"><div class="label">Max Drawdown</div><div class="value" id="kpi-mdd">—</div></div></section>
+
+    <section class="grid"><article class="panel card"><h2>Cumulative return</h2><canvas id="lineChart"></canvas></article><article class="panel card"><h2>Daily return distribution</h2><canvas id="histChart"></canvas></article></section>
+    <p class="foot">Frontend template for the FastAPI risk portal.</p>
+  </div>
+<script>
+(function () {
+  const toggle = document.querySelector('[data-theme-toggle]');
+  const root = document.documentElement;
+  let theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  function applyTheme() { root.setAttribute('data-theme', theme); toggle.textContent = theme === 'dark' ? '☀' : '☾'; }
+  applyTheme();
+  toggle.addEventListener('click', () => { theme = theme === 'dark' ? 'light' : 'dark'; applyTheme(); updateCharts(); });
+})();
+const API_URL = 'http://127.0.0.1:8000/risk/analyse';
+const statusText = document.getElementById('status-text');
+const sample = { tickers: ['0700.HK'], weights: [1.0], lookback_days: 365, confidence_level: 0.95 };
+function parseList(v) { return v.split(',').map(s => s.trim()).filter(Boolean); }
+function parseNums(v) { return v.split(',').map(s => Number(s.trim())).filter(n => !Number.isNaN(n)); }
+function fmtPct(v) { return (v * 100).toFixed(2) + '%'; }
+function fmtNum(v) { return Number(v).toFixed(2); }
+let lineChart; let histChart;
+function makeCharts() {
+  const lineCanvas = document.getElementById('lineChart');
+  const histCanvas = document.getElementById('histChart');
+  const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+  if (lineChart) lineChart.destroy();
+  if (histChart) histChart.destroy();
+  lineChart = new Chart(lineCanvas, { type: 'line', data: { labels: ['1','2','3','4','5','6','7','8'], datasets: [{ label: 'Cumulative return', data: [0,0.01,0.015,0.008,0.02,0.017,0.03,0.028], borderColor: primary, backgroundColor: 'transparent', tension: 0.3, fill: false }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(128,128,128,.15)' } }, y: { grid: { color: 'rgba(128,128,128,.15)' }, ticks: { callback: v => fmtPct(v) } } } } });
+  histChart = new Chart(histCanvas, { type: 'bar', data: { labels: ['-6%','-4%','-2%','0%','2%','4%','6%'], datasets: [{ label: 'Frequency', data: [2,4,9,15,8,3,1], backgroundColor: primary }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(128,128,128,.15)' } } } } });
+}
+function updateCharts() { makeCharts(); }
+async function submitAnalysis(payload) { statusText.textContent = 'Analysing portfolio...'; const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!res.ok) throw new Error(await res.text()); return await res.json(); }
+function render(data) { const m = data.risk_metrics; document.getElementById('kpi-var-h').textContent = fmtPct(m.var_historical); document.getElementById('kpi-es').textContent = fmtPct(m.expected_shortfall); document.getElementById('kpi-vol').textContent = fmtPct(m.annualised_volatility); document.getElementById('kpi-mdd').textContent = fmtPct(m.max_drawdown); document.getElementById('var-value').textContent = fmtPct(m.var_historical); document.getElementById('sharpe-value').textContent = fmtNum(m.sharpe_ratio); statusText.textContent = 'Latest run: ' + data.computed_at; }
+document.getElementById('fill-sample').addEventListener('click', () => { document.getElementById('tickers').value = sample.tickers.join(', '); document.getElementById('weights').value = sample.weights.join(', '); document.getElementById('lookback').value = sample.lookback_days; document.getElementById('confidence').value = sample.confidence_level; statusText.textContent = 'Sample loaded'; });
+document.getElementById('risk-form').addEventListener('submit', async (e) => { e.preventDefault(); const payload = { tickers: parseList(document.getElementById('tickers').value), weights: parseNums(document.getElementById('weights').value), lookback_days: Number(document.getElementById('lookback').value), confidence_level: Number(document.getElementById('confidence').value) }; try { const data = await submitAnalysis(payload); render(data); } catch (err) { statusText.textContent = err.message; console.error(err); } });
+makeCharts();
+</script>
+</body>
+</html>
