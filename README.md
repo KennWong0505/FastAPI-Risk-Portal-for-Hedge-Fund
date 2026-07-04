@@ -188,3 +188,5 @@ Incorrect:
   "weights": "0.6, 0.4"
 }
 ```
+
+![Dashboard screenshot](assets/dashboard.png)
