@@ -189,4 +189,5 @@ Incorrect:
 }
 ```
 
+## Dashboard Preview
 ![Dashboard screenshot](assets/dashboard.png)
