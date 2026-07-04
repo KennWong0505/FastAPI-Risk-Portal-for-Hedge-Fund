@@ -188,18 +188,3 @@ Incorrect:
   "weights": "0.6, 0.4"
 }
 ```
-
-## GitHub Workflow
-
-1. Initialise git.
-2. Commit the project.
-3. Create a GitHub repository.
-4. Push the branch.
-5. Add a clean README, screenshots, and a short project description.
-
-## Next Milestones
-
-- Add stronger validation and better error messages.
-- Improve charting and historical return visuals.
-- Add a second test for invalid input.
-- Prepare deployment instructions for Render or another host.
